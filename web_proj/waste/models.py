@@ -17,8 +17,9 @@ class waste_type(models.Model):
     waste_type_fee = models.CharField(max_length=30)
     waste_type_area_no = models.IntegerField()
     
-    def __str__(self):
-        return [self.waste_type_no, self.waste_type_waste_div_no, self.waste_type_name, self.waste_type_kor_name, self.waste_type_size, self.waste_type_fee, self.waste_type_area_no]
+    #def __str__(self):
+     #   return [self.waste_type_no, self.waste_type_waste_div_no, self.waste_type_name, self.waste_type_kor_name, self.waste_type_size, self.waste_type_fee, self.waste_type_area_no]
+        #return self
     
 class user_info(models.Model):
     user_info_no = models.IntegerField(primary_key=True)
