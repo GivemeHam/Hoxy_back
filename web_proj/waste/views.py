@@ -1,19 +1,22 @@
 from django.shortcuts import render
 
-# Create your views here.
 from django.http import HttpResponse
-from .models import waste_type
-from .models import waste_div
-from .models import user_info
-from .models import board_review
-from .models import board
-from .models import area
-from .models import apply_info
+
+#deeplearning
+from .deep_learning.inceptionv3_inference import * 
+#models
+from .models import *
 from ast import literal_eval
 from datetime import datetime
 
 def home(request):
     return HttpResponse("Hello, Django!")
+
+#사진 분류
+def inceptionv3_inference():
+    return run_inference_on_image()
+
+
 
 #request_data
 #waste_type_name, waste_type_area_no
@@ -23,7 +26,11 @@ def select_waste_type(request):
    # results = waste_type.objects.all()
     data = request.GET.get("data")
     data_dic = literal_eval(data)
-    results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
+    
+    answer = inceptionv3_inference()
+    #print(answer[0]['1_name'])
+    #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
+    results = waste_type.objects.filter(waste_type_name=answer[0]['1_name'], waste_type_area_no=data_dic['waste_type_area_no'])
     
     list = []
     for rst in results:
