@@ -5,7 +5,6 @@
 import numpy as np
 import tensorflow as tf
 
-image_path = './waste/deep_learning/image/test.jpg'                                           # 추론을 진행할 이미지 파일경로
 graph_pb_file_path = './waste/deep_learning/output_graph.pb'                                  # 읽어들일 graph 파일 경로
 #labels_txt_file_path = 'C:/project/output.txt'                              # 읽어들일 labels 파일 경로
 labels_txt_file_path = './waste/deep_learning/output_labels.txt'                              # 읽어들일 labels 파일 경로
@@ -18,9 +17,10 @@ def create_graph():
     _ = tf.import_graph_def(graph_def, name='')
 
 # 이미지에 대한 추론(Inference)을 진행합니다.
-def run_inference_on_image():
+def run_inference_on_image(image_name):
+  image_path = './waste/deep_learning/image/'                                           # 추론을 진행할 이미지 파일경로
   answer = None
-
+  image_path += image_name
   # 만약 경로에 이미지 파일이 없을 경우 오류 로그를 출력합니다.
   if not tf.gfile.Exists(image_path):
     tf.logging.fatal('추론할 이미지 파일이 존재하지 않습니다. %s', image_path)
@@ -75,4 +75,4 @@ def run_inference_on_image():
     return list
     
 if __name__ == '__main__':
-  run_inference_on_image()
+  run_inference_on_image(image_name)

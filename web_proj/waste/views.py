@@ -15,11 +15,11 @@ def home(request):
     return HttpResponse("Hello, Django!")
 
 #사진 분류
-def inceptionv3_inference():
-    return run_inference_on_image()
+def inceptionv3_inference(image_name):
+    return run_inference_on_image(image_name)
 
 
-def index(request):
+def image_post(request):
     form = UploadFileForm()
     print("언제될까")
     if request.method == 'POST':
@@ -41,12 +41,12 @@ def index(request):
                 #os.remove("media/"+str(x.name))
                 #print(str(x.name)+"삭제완료")
             context = {'form':form,}
-            return render(request, 'waste_db/index.html', context)
+            return x.name
             # return HttpResponse(" File uploaded! ")
     else:
         form = UploadFileForm()
 
-    return render(request, 'waste_db/index.html', {'form': form})
+    return "false"
 
 
 #request_data
@@ -54,20 +54,22 @@ def index(request):
 #response_data
 #waste_type
 def select_waste_type(request):
-   # results = waste_type.objects.all()
-    data = request.GET.get("data")
-    data_dic = literal_eval(data)
+    image_name = image_post(request)
+    area_no = request.POST.get("area_no")
+    if image_name != "false":
+        #get image
+        answer = inceptionv3_inference(image_name)
+    else :
+        print("image not found ERROR")
     
-    #get image
-    image = Image(title=request.user)
-    form = ImageFormModel(request.POST, request.FILES, instance=image)
-    if form.is_valid():
-       	form.save()
-
-    answer = inceptionv3_inference()
+   # results = waste_type.objects.all()
+   # data = request.GET.get("data")
+   # data_dic = literal_eval(data)
+    
+    
     #print(answer[0]['1_name'])
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
-    results = waste_type.objects.filter(waste_type_name=answer[0]['1_name'], waste_type_area_no=data_dic['waste_type_area_no'])
+    results = waste_type.objects.filter(waste_type_name=answer[0]['1_name'], waste_type_area_no=area_no)
     
     list = []
     for rst in results:
