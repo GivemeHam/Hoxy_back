@@ -1,5 +1,8 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path("", views.home, name="home"),
@@ -10,5 +13,9 @@ urlpatterns = [
     path('select_board/', views.select_board, name="select_board"),
     path('insert_board_reivew/', views.insert_board_review, name="insert_board_review"),
     path('select_board_reivew/', views.select_board_reivew, name="select_board_review"),
+    path('index/', csrf_exempt(views.index), name="index"),
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

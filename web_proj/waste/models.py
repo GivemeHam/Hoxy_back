@@ -53,5 +53,6 @@ class apply_info(models.Model):
     apply_info_code = models.CharField(max_length=30) 
     apply_info_user_no = models.IntegerField()
 
-
-    
+class Image(models.Model):
+	title = models.CharField(max_length=100)
+	photo = models.ImageField(blank=True)

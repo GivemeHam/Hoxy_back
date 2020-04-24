@@ -4,6 +4,8 @@ from django.http import HttpResponse
 
 #deeplearning
 from .deep_learning.inceptionv3_inference import * 
+from .forms import *
+import os
 #models
 from .models import *
 from ast import literal_eval
@@ -17,6 +19,35 @@ def inceptionv3_inference():
     return run_inference_on_image()
 
 
+def index(request):
+    form = UploadFileForm()
+    print("언제될까")
+    if request.method == 'POST':
+        print(os.getcwd())
+        print("POST method")
+        print("request.POST : " + str(request.POST))
+        print("request.FILES : " + str(request.FILES))
+        form = UploadFileForm(request.POST, request.FILES)
+        print("dd")
+        if form.is_valid():
+            print("Valid")
+            for count, x in enumerate(request.FILES.getlist("files")):
+                def handle_uploaded_file(f):
+                    with open(os.path.join(os.getcwd(),"waste/deep_learning/image", f.name),'wb+') as destination:
+                        for chunk in f.chunks():
+                            destination.write(chunk)
+                handle_uploaded_file(x)
+                print(x.name)
+                #os.remove("media/"+str(x.name))
+                #print(str(x.name)+"삭제완료")
+            context = {'form':form,}
+            return render(request, 'waste_db/index.html', context)
+            # return HttpResponse(" File uploaded! ")
+    else:
+        form = UploadFileForm()
+
+    return render(request, 'waste_db/index.html', {'form': form})
+
 
 #request_data
 #waste_type_name, waste_type_area_no
@@ -27,6 +58,12 @@ def select_waste_type(request):
     data = request.GET.get("data")
     data_dic = literal_eval(data)
     
+    #get image
+    image = Image(title=request.user)
+    form = ImageFormModel(request.POST, request.FILES, instance=image)
+    if form.is_valid():
+       	form.save()
+
     answer = inceptionv3_inference()
     #print(answer[0]['1_name'])
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
