@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'waste',
         'USER': 'user',
         'PASSWORD': '513246',
-        'HOST': '18.222.175.17',
+        'HOST': '54.173.116.26',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"'
