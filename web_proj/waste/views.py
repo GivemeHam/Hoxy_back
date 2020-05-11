@@ -9,7 +9,11 @@ import os
 #models
 from .models import *
 from ast import literal_eval
-from datetime import datetime
+from datetime import 
+
+#image decode
+import base64
+from django.core.files.base import ContentFile
 
 def home(request):
     return HttpResponse("Hello, Django!")
@@ -21,7 +25,6 @@ def inceptionv3_inference(image_name):
 
 def image_post(request):
     form = UploadFileForm()
-    print("언제될까")
     if request.method == 'POST':
         print(os.getcwd())
         print("POST method")
@@ -55,6 +58,12 @@ def image_post(request):
 #waste_type
 def select_waste_type(request):
     image_name = image_post(request)
+
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+    #image decode
+    file_data = ContentFile(base64.b64decode(data_dic['files']), name='temp.jpg')
+
     area_no = request.POST.get("area_no")
     if image_name != "false":
         #get image
@@ -90,7 +99,7 @@ def select_waste_type(request):
 #waste_type_name, waste_type_area_no
 
 def insert_waste_apply_info(request):
-    data = request.GET.get("data")
+    data = request.POST.get("data")
     data_dic = literal_eval(data)
 
     #insert
@@ -110,7 +119,7 @@ def insert_waste_apply_info(request):
 #board_title, board_ctnt, board_user_no, board_waste_area_no
 
 def insert_board(request):
-    data = request.GET.get("data")
+    data = request.POST.get("data")
     data_dic = literal_eval(data)
     #current_time
     now = datetime.now()
@@ -131,15 +140,14 @@ def insert_board(request):
 #response_data
 #board_no, board_title, board_user_name, board_reg_date,board_waste_area_no
 def select_board_title(request):
+    
     results = board.objects.all()
-    data = request.GET.get("data")
-    data_dic = literal_eval(data)
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
     
     list = []
     for rst in results:
         dic = {}
-        dic['board_no'] = rst.board_no
+        dic["board_no"] = rst.board_no
         dic['board_title'] = rst.board_title
         user_name = user_info.objects.filter(user_info_no=rst.board_reg_user_no)
         dic['board_user_name'] = user_name[0].user_info_name
@@ -156,7 +164,7 @@ def select_board_title(request):
 #board_no, board_title, board_user_name, board_reg_date,board_waste_area_no
 def select_board(request):
     #results = waste_type.objects.all()
-    data = request.GET.get("data")
+    data = request.POST.get("data")
     data_dic = literal_eval(data)
     results = board.objects.filter(board_no=data_dic['board_no'])
    
@@ -179,7 +187,7 @@ def select_board(request):
 #board_no, board_reivew_ctnt, board_reivew_user_no,
 
 def insert_board_review(request):
-    data = request.GET.get("data")
+    data = request.POST.get("data")
     data_dic = literal_eval(data)
     #current_time
     now = datetime.now()
@@ -199,7 +207,7 @@ def insert_board_review(request):
 #board_review_no, board_review_ctnt, board_review_user_name, board_review_reg_date
 def select_board_reivew(request):
     #results = board.objects.all()
-    data = request.GET.get("data")
+    data = request.POST.get("data")
     data_dic = literal_eval(data)
     results = board_review.objects.filter(board_review_board_no=data_dic['board_review_board_no'])
     
@@ -215,3 +223,24 @@ def select_board_reivew(request):
         
     context = {'result_value':list}
     return render(request, 'board_db/select_board_review.html', context )
+
+#request_data
+#user_info_no, user_info_name
+
+def insert_user_info(request):
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+    
+    #insert
+    result = user_info(user_info_no=data_dic['user_info_no'],
+                        user_info_name=data_dic['user_info_name'])
+    result.save()
+
+    context = {'result_value':"success"}
+    return render(request, 'user_db/insert_user_info.html', context )
+
+def test(request):
+    data = request.POST.get("data")
+  
+    context = {'result_value':data}
+    return render(request, 'user_db/test.html', context )
