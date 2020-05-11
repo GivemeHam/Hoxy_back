@@ -2,6 +2,8 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
+import logging
+logger = logging.getLogger('test')
 #deeplearning
 from .deep_learning.inceptionv3_inference import * 
 from .forms import *
@@ -9,7 +11,7 @@ import os
 #models
 from .models import *
 from ast import literal_eval
-from datetime import 
+from datetime import datetime
 
 #image decode
 import base64
@@ -23,48 +25,62 @@ def inceptionv3_inference(image_name):
     return run_inference_on_image(image_name)
 
 
-def image_post(request):
-    form = UploadFileForm()
-    if request.method == 'POST':
-        print(os.getcwd())
-        print("POST method")
-        print("request.POST : " + str(request.POST))
-        print("request.FILES : " + str(request.FILES))
-        form = UploadFileForm(request.POST, request.FILES)
-        print("dd")
-        if form.is_valid():
-            print("Valid")
-            for count, x in enumerate(request.FILES.getlist("files")):
-                def handle_uploaded_file(f):
-                    with open(os.path.join(os.getcwd(),"waste/deep_learning/image", f.name),'wb+') as destination:
-                        for chunk in f.chunks():
-                            destination.write(chunk)
-                handle_uploaded_file(x)
-                print(x.name)
-                #os.remove("media/"+str(x.name))
-                #print(str(x.name)+"삭제완료")
-            context = {'form':form,}
-            return x.name
-            # return HttpResponse(" File uploaded! ")
-    else:
-        form = UploadFileForm()
+# def image_post(request):
+#     form = UploadFileForm()
+#     if request.method == 'POST':
+#         print(os.getcwd())
+#         print("POST method")
+#         print("request.POST : " + str(request.POST))
+#         print("request.FILES : " + str(request.FILES))
+#         form = UploadFileForm(request.POST, request.FILES)
+#         print("dd")
+#         if form.is_valid():
+#             print("Valid")
+#             for count, x in enumerate(request.FILES.getlist("files")):
+#                 def handle_uploaded_file(f):
+#                     with open(os.path.join(os.getcwd(),"waste/deep_learning/image", f.name),'wb+') as destination:
+#                         for chunk in f.chunks():
+#                             destination.write(chunk)
+#                 handle_uploaded_file(x)
+#                 print(x.name)
+#                 #os.remove("media/"+str(x.name))
+#                 #print(str(x.name)+"삭제완료")
+#             context = {'form':form,}
+#             return x.name
+#             # return HttpResponse(" File uploaded! ")
+#     else:
+#         form = UploadFileForm()
 
-    return "false"
+#     return "false"
 
+
+def save_image(image_data):
+    def handle_uploaded_file(f):
+        with open(os.path.join(os.getcwd(),"waste/deep_learning/image", "f_name.jpg"),'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+    handle_uploaded_file(image_data)
+
+            #os.remove("media/"+str(x.name))
+            #print(str(x.name)+"삭제완료")
+    return "f_name.jpg"
 
 #request_data
 #waste_type_name, waste_type_area_no
 #response_data
 #waste_type
 def select_waste_type(request):
-    image_name = image_post(request)
+    #image_name = image_post(request)
 
     data = request.POST.get("data")
     data_dic = literal_eval(data)
-    #image decode
-    file_data = ContentFile(base64.b64decode(data_dic['files']), name='temp.jpg')
 
-    area_no = request.POST.get("area_no")
+    logger.error(data_dic['files'])
+    #image decode
+    image_data = ContentFile(base64.b64decode(data_dic['files']), name='temp.jpg')
+    image_name = save_image(image_data)
+
+    area_no = data_dic['area_no']
     if image_name != "false":
         #get image
         answer = inceptionv3_inference(image_name)
@@ -92,7 +108,7 @@ def select_waste_type(request):
         dic['waste_type_area_no'] = rst.waste_type_area_no
         list.append(dic)
         
-    context = {'result_value':list}
+    context = {'result_value':data_dic['files']}
     return render(request, 'waste_db/waste_type.html', context )
 
 #request_data
