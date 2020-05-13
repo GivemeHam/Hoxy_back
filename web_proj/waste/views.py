@@ -54,15 +54,13 @@ def inceptionv3_inference(image_name):
 #     return "false"
 
 
-def save_image(image_data):
-    def handle_uploaded_file(f):
-        with open(os.path.join(os.getcwd(),"waste/deep_learning/image", "f_name.jpg"),'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
-    handle_uploaded_file(image_data)
+def save_image(f):
+    with open(os.path.join(os.getcwd(),"waste/deep_learning/image", "f_name.jpg"),'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
-            #os.remove("media/"+str(x.name))
-            #print(str(x.name)+"삭제완료")
+        #os.remove("media/"+str(x.name))
+        #print(str(x.name)+"삭제완료")
     return "f_name.jpg"
 
 #request_data
@@ -75,9 +73,14 @@ def select_waste_type(request):
     data = request.POST.get("data")
     data_dic = literal_eval(data)
 
-    logger.error(data_dic['files'])
+    
     #image decode
-    image_data = ContentFile(base64.b64decode(data_dic['files']), name='temp.jpg')
+    imgstr = data_dic['files']
+    imgstr += "=" * ((4 - len(imgstr) % 4) % 4)
+    imgstr = imgstr.translate({ ord(' '): '+' })
+    #logger.error(imgstr)
+    image_data = ContentFile(base64.b64decode(imgstr), name='f_name.jpg')
+    
     image_name = save_image(image_data)
 
     area_no = data_dic['area_no']
@@ -108,7 +111,7 @@ def select_waste_type(request):
         dic['waste_type_area_no'] = rst.waste_type_area_no
         list.append(dic)
         
-    context = {'result_value':data_dic['files']}
+    context = {'result_value':list}
     return render(request, 'waste_db/waste_type.html', context )
 
 #request_data
