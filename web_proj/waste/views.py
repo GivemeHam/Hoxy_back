@@ -74,17 +74,17 @@ def select_waste_type(request):
     data_dic = literal_eval(data)
 
     
+    image_name = data_dic['file_name']
     #image decode
     imgstr = data_dic['files']
     imgstr += "=" * ((4 - len(imgstr) % 4) % 4)
     imgstr = imgstr.translate({ ord(' '): '+' })
     #logger.error(imgstr)
-    image_data = ContentFile(base64.b64decode(imgstr), name='f_name.jpg')
+    image_data = ContentFile(base64.b64decode(imgstr), name=image_name)
     
     save_image(image_data)
 
     area_no = data_dic['area_no']
-    image_name = data_dic['file_name']
     if image_name != "false":
         #get image
         answer = inceptionv3_inference(image_name)
