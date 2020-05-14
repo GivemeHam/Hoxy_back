@@ -244,14 +244,14 @@ def select_board_reivew(request):
     return render(request, 'board_db/select_board_review.html', context )
 
 #request_data
-#user_info_no, user_info_name
+#user_info_no, user_info_id, user_info_name
 
 def insert_user_info(request):
     data = request.POST.get("data")
     data_dic = literal_eval(data)
     
     #insert
-    result = user_info(user_info_no=data_dic['user_info_no'],
+    result = user_info(user_info_id=data_dic['user_info_id'],
                         user_info_name=data_dic['user_info_name'])
     result.save()
 

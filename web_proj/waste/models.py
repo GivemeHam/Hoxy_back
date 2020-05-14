@@ -18,6 +18,7 @@ class waste_type(models.Model):
     
 class user_info(models.Model):
     user_info_no = models.IntegerField(primary_key=True)
+    user_info_id = models.CharField(max_length=30)
     user_info_name = models.CharField(max_length=30)
 
 class board_review(models.Model):
