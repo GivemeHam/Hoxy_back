@@ -81,9 +81,10 @@ def select_waste_type(request):
     #logger.error(imgstr)
     image_data = ContentFile(base64.b64decode(imgstr), name='f_name.jpg')
     
-    image_name = save_image(image_data)
+    save_image(image_data)
 
     area_no = data_dic['area_no']
+    image_name = data_dic['file_name']
     if image_name != "false":
         #get image
         answer = inceptionv3_inference(image_name)
