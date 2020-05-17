@@ -54,14 +54,14 @@ def inceptionv3_inference(image_name):
 #     return "false"
 
 
-def save_image(f):
-    with open(os.path.join(os.getcwd(),"waste/deep_learning/image", "f_name.jpg"),'wb+') as destination:
+def save_image(f, f_name):
+    with open(os.path.join(os.getcwd(),"waste/deep_learning/image", f_name),'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
         #os.remove("media/"+str(x.name))
         #print(str(x.name)+"삭제완료")
-    return "f_name.jpg"
+    return f_name
 
 #request_data
 #waste_type_name, waste_type_area_no
@@ -82,7 +82,7 @@ def select_waste_type(request):
     #logger.error(imgstr)
     image_data = ContentFile(base64.b64decode(imgstr), name=image_name)
     
-    save_image(image_data)
+    save_image(image_data, image_name)
 
     area_no = data_dic['area_no']
     if image_name != "false":
@@ -95,7 +95,7 @@ def select_waste_type(request):
    # data = request.GET.get("data")
    # data_dic = literal_eval(data)
     
-    
+    print("answer[0]['1_name'] : " + answer[0]['1_name'])
     #print(answer[0]['1_name'])
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
     results = waste_type.objects.filter(waste_type_name=answer[0]['1_name'], waste_type_area_no=area_no)

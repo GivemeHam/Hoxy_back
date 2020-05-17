@@ -63,7 +63,11 @@ def run_inference_on_image(image_name):
 
       print('%s (확률 = %.5f)' % (label_name, probability))
       
-      dic[str_i + '_name']=label_name[2:-3]
+      label_name = label_name[2:-3]
+      label_name = label_name.replace("\\n","",1)
+      label_name = label_name.replace("\\r","",1)
+
+      dic[str_i + '_name']=label_name
       dic[str_i + '_probability']=probability
       list.append(dic)
 
