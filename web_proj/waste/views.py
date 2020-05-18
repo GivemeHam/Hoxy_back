@@ -194,7 +194,7 @@ def select_board(request):
         dic['board_no'] = rst.board_no
         dic['board_title'] = rst.board_title
         dic['board_ctnt'] = rst.board_ctnt
-        user_name = user_info.objects.filter(user_info_no=rst.board_reg_user_no)
+        user_name = user_info.objects.filter(user_info_id=rst.board_reg_user_no)
         dic['board_user_name'] = user_name[0].user_info_name
         dic['board_reg_date'] = rst.board_reg_date
         dic['board_waste_area_no'] = rst.board_waste_area_no
