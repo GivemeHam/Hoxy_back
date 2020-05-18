@@ -149,9 +149,8 @@ def insert_board(request):
     result = board(board_title=data_dic['board_title'],
                         board_ctnt=data_dic['board_ctnt'],
                         board_reg_user_no=data_dic['board_reg_user_no'],
-                        board_user_no=data_dic['board_user_no'],
                         board_reg_date=formatted_date,
-                        board_area_no=data_dic['board_area_no'] )
+                        board_waste_area_no=data_dic['board_area_no'] )
     result.save()
 
     context = {'result_value':"success"}
@@ -166,10 +165,11 @@ def select_board_title(request):
     
     list = []
     for rst in results:
+        
         dic = {}
         dic["board_no"] = rst.board_no
         dic['board_title'] = rst.board_title
-        user_name = user_info.objects.filter(user_info_no=rst.board_reg_user_no)
+        user_name = user_info.objects.filter(user_info_id=rst.board_reg_user_no)
         dic['board_user_name'] = user_name[0].user_info_name
         dic['board_reg_date'] = rst.board_reg_date
         dic['board_waste_area_no'] = rst.board_waste_area_no
@@ -250,13 +250,17 @@ def select_board_reivew(request):
 def insert_user_info(request):
     data = request.POST.get("data")
     data_dic = literal_eval(data)
-    
+    #select
+    results = user_info.objects.filter(user_info_id=data_dic['user_info_id'])
+    for res in results:
+        context = {'result_value':"success2"}
+        return render(request, 'user_db/insert_user_info.html', context )
+    else:
     #insert
-    result = user_info(user_info_id=data_dic['user_info_id'],
+        result = user_info(user_info_id=data_dic['user_info_id'],
                         user_info_name=data_dic['user_info_name'])
-    result.save()
-
-    context = {'result_value':"success"}
+        result.save()
+        context = {'result_value':"success"}
     return render(request, 'user_db/insert_user_info.html', context )
 
 def test(request):
