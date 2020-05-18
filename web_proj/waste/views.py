@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from django.http import HttpResponse
-
+from rest_framework.decorators import api_view
 import logging
 logger = logging.getLogger('test')
 #deeplearning
@@ -12,38 +12,42 @@ import os
 from .models import *
 from ast import literal_eval
 from datetime import datetime
-
 #image decode
 import base64
 from django.core.files.base import ContentFile
 #################
 # views.py
+import requests
+from django.http import HttpResponse as Response
+import json
+@api_view(['POST'])
 def KakaoPay(request):
-    url = "https://kapi.kakao.com"
-    headers = {
-        'Authorization': "KakaoAK " + "Admin Key Here",
-        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-    }
-    params = {
-        'cid': "TC0ONETIME",
-        'partner_order_id': '1001',
-        'partner_user_id': 'dongsik',
-        'item_name': '포인트',
-        'quantity': 1,
-        'total_amount': 0,
-        'vat_amount': 200,
-        'tax_free_amount': 0,
-        'approval_url': 'http://localhost:8080',
-        'fail_url': 'http://localhost:8080',
-        'cancel_url': 'http://localhost:8080',
-    }
-    response = requests.post(url+"/v1/payment/ready", params=params, headers=headers)
-    response = json.loads(response.text)
-    #return Response(response)    
-    return render(request, 'waste_db/pay.html', response )
+    url = "https://kapi.kakao.com/v1/payment/ready"
+
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=123&tax_free_amount=0&approval_url=http://172.16.46.22:8000/KakaoPaySuccess/&cancel_url=http://172.16.46.22:8000&fail_url=http://172.16.46.22:8000"
+    headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = requests.request("POST", url, headers=headers, data = payload)
+
+    print(response.text.encode('utf8'),"here------------------------------")
+    
+    # context = {'result_value':response}
+    # return render(request, 'waste_db/pay.html', context )
+
+    return Response(response)    
 
 #######################
+@api_view(['POST'])
+def KakaoPaySuccess(request):
+    print(request,"============here=========================")
+    
+    # context = {'result_value':response}
+    # return render(request, 'waste_db/pay.html', context )
 
+    context = {'result_value':request}
+    return render(request, 'waste_db/KakaoPaySuccess.html', context )
+
+########################
 def home(request):
     return HttpResponse("Hello, Django!")
 
