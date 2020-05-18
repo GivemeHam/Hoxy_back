@@ -14,10 +14,11 @@ urlpatterns = [
     path('insert_board_reivew/', csrf_exempt(views.insert_board_review), name="insert_board_review"),
     path('select_board_reivew/', csrf_exempt(views.select_board_reivew), name="select_board_review"),
     path('insert_user_info/', csrf_exempt(views.insert_user_info), name="insert_user_info"),
+    path('KakaoPay/',csrf_exempt(views.KakaoPay), name="KakaoPay"),
     path('test/', csrf_exempt(views.test), name="test"),
     #path('index/', csrf_exempt(views.index), name="index"),
-
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)

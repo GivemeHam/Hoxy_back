@@ -16,6 +16,33 @@ from datetime import datetime
 #image decode
 import base64
 from django.core.files.base import ContentFile
+#################
+# views.py
+def KakaoPay(request):
+    url = "https://kapi.kakao.com"
+    headers = {
+        'Authorization': "KakaoAK " + "Admin Key Here",
+        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+    }
+    params = {
+        'cid': "TC0ONETIME",
+        'partner_order_id': '1001',
+        'partner_user_id': 'dongsik',
+        'item_name': '포인트',
+        'quantity': 1,
+        'total_amount': 0,
+        'vat_amount': 200,
+        'tax_free_amount': 0,
+        'approval_url': 'http://localhost:8080',
+        'fail_url': 'http://localhost:8080',
+        'cancel_url': 'http://localhost:8080',
+    }
+    response = requests.post(url+"/v1/payment/ready", params=params, headers=headers)
+    response = json.loads(response.text)
+    #return Response(response)    
+    return render(request, 'waste_db/pay.html', response )
+
+#######################
 
 def home(request):
     return HttpResponse("Hello, Django!")
