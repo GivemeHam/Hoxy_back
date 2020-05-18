@@ -24,7 +24,7 @@ import json
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=123&tax_free_amount=0&approval_url=http://172.16.46.22:8000/KakaoPaySuccess/&cancel_url=http://172.16.46.22:8000&fail_url=http://172.16.46.22:8000"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=ad&item_name=test&quantity=1&total_amount=312333&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
@@ -37,10 +37,19 @@ def KakaoPay(request):
     return Response(response)    
 
 #######################
-@api_view(['POST'])
+@api_view(['GET'])
 def KakaoPaySuccess(request):
-    print(request,"============here=========================")
-    
+    print(request.GET.get("pg_token"),"============here=========================")
+    #
+    url = "https://kapi.kakao.com/v1/payment/approve"
+
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany"
+    headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = requests.request("POST", url, headers=headers, data = payload)
+
+    print(response.text.encode('utf8'),"here------------------------------")
+    #
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
@@ -117,6 +126,22 @@ def select_waste_type(request):
 
     area_no = data_dic['area_no']
     if image_name != "false":
+        #test
+        list = []
+        dic = {}
+        dic['waste_type_no'] = 1
+        dic['waste_type_waste_div_no'] = 1
+        dic['waste_type_name'] = "ss"
+        dic['waste_type_kor_name'] = "한국"
+        dic['waste_type_size'] = "33"
+        dic['waste_type_fee'] = "55"
+        dic['waste_type_area_no'] = "1"
+        list.append(dic)
+        context = {'result_value':list}
+
+        return render(request, 'waste_db/waste_type.html', context )
+
+        #test
         #get image
         answer = inceptionv3_inference(image_name)
     else :
