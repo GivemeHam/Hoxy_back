@@ -1,6 +1,8 @@
 from django.db import models
 
 # Create your models here.
+
+
 class waste_div(models.Model):
     waste_div_no = models.IntegerField(primary_key=True)
     waste_div_name = models.CharField(max_length=30)

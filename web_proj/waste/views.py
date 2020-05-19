@@ -20,18 +20,25 @@ from django.core.files.base import ContentFile
 import requests
 from django.http import HttpResponse as Response
 import json
+
+tid=0
 @api_view(['POST'])
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=ad&item_name=test&quantity=1&total_amount=312333&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=15032&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=33&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
 
-    print(response.text.encode('utf8'),"here------------------------------")
-    
-    # context = {'result_value':response}
+    #print(response.text.encode('utf8'),"here------------------------------")
+    json_string=response.text.encode('utf8')
+    str_json=json_string.decode('utf-8')
+    dict_json=json.loads(str_json)
+    tid=dict_json['tid']
+    request.session['tid']=tid
+    print(tid,"33333333333333",request.session.get('tid'))
+        # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
     return Response(response)    
@@ -40,15 +47,19 @@ def KakaoPay(request):
 @api_view(['GET'])
 def KakaoPaySuccess(request):
     print(request.GET.get("pg_token"),"============here=========================")
+    print(request.GET.get("random"),"please!!!!!!!!")
+    pg_token=request.GET.get("pg_token")
+    
+    print(type(pg_token),"12341234123412341234","tid!!!!",request.session.get('tid'))
     #
     url = "https://kapi.kakao.com/v1/payment/approve"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&tid="+str(tid)+"&pg_token="+request.GET.get("pg_token")
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
 
-    print(response.text.encode('utf8'),"here------------------------------")
+    print(response.text.encode('utf8'),"here22222------------------------------")
     #
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
