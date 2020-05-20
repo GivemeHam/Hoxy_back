@@ -26,7 +26,7 @@ tid=0
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=777&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=44&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=tv123&quantity=1&total_amount=782&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=109&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
@@ -37,7 +37,7 @@ def KakaoPay(request):
     dict_json=json.loads(str_json)
     tid=dict_json['tid']
     #인증 쌍 만들기
-    random=44
+    random=109
     result=forpay(random_no=random,
                         tid=tid)
     result.save()
@@ -53,10 +53,10 @@ def KakaoPay(request):
 @api_view(['GET'])
 def KakaoPaySuccess(request):
     print(request.GET.get("pg_token"),"============here=========================")
-    print(request.GET.get("random"),"please!!!!!!!!")
+    print(type(request.GET.get("random")),"please!!!!!!!!")
     pg_token=request.GET.get("pg_token")
     #db에서 가져옴
-    results=forpay.objects.filter(random_no=44)
+    results=forpay.objects.filter(random_no=request.GET.get("random"))
     list=[]
     for rst in results :
         dic={}
