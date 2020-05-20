@@ -299,7 +299,7 @@ def insert_board_review(request):
     #insert
     result = board(board_review_board_no=data_dic['board_review_board_no'],
                         board_review_ctnt=data_dic['board_review_ctnt'],
-                        board_review_reg_user_no=data_dic['board_review_reg_user_no'],
+                        board_review_reg_user_no=data_dic['board_review_reg_user_id'],
                         board_reg_date=formatted_date)
     result.save()
 
@@ -308,7 +308,7 @@ def insert_board_review(request):
 
 #response_data
 #board_review_no, board_review_ctnt, board_review_user_name, board_review_reg_date
-def select_board_reivew(request):
+def select_board_review(request):
     #results = board.objects.all()
     data = request.POST.get("data")
     data_dic = literal_eval(data)
@@ -319,7 +319,7 @@ def select_board_reivew(request):
         dic = {}
         dic['board_review_no'] = rst.board_review_no
         dic['board_review_ctnt'] = rst.board_review_ctnt
-        user_name = user_info.objects.filter(user_info_no=rst.board_review_reg_user_no)
+        user_name = user_info.objects.filter(user_info_id=rst.board_review_reg_user_no)
         dic['board_review_user_name'] = user_name[0].user_info_name
         dic['board_review_reg_date'] = rst.board_review_reg_date
         list.append(dic)
