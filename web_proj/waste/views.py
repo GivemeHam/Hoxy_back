@@ -26,7 +26,7 @@ tid=0
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=15032&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=33&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=777&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=44&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
@@ -36,6 +36,12 @@ def KakaoPay(request):
     str_json=json_string.decode('utf-8')
     dict_json=json.loads(str_json)
     tid=dict_json['tid']
+    #인증 쌍 만들기
+    random=44
+    result=forpay(random_no=random,
+                        tid=tid)
+    result.save()
+    #
     request.session['tid']=tid
     print(tid,"33333333333333",request.session.get('tid'))
         # context = {'result_value':response}
@@ -49,12 +55,22 @@ def KakaoPaySuccess(request):
     print(request.GET.get("pg_token"),"============here=========================")
     print(request.GET.get("random"),"please!!!!!!!!")
     pg_token=request.GET.get("pg_token")
-    
-    print(type(pg_token),"12341234123412341234","tid!!!!",request.session.get('tid'))
+    #db에서 가져옴
+    results=forpay.objects.filter(random_no=44)
+    list=[]
+    for rst in results :
+        dic={}
+        dic["random_no"]=rst.random_no
+        dic['tid']=rst.tid
+        list.append(dic)
+    print(list,"wpqkfwpqkfwpqkf0000000")
+    tid_no=list[0]['tid']
+    #
+    print(type(pg_token),"12341234123412341234","tid!!!!",request.session.get('tid'),tid_no)
     #
     url = "https://kapi.kakao.com/v1/payment/approve"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&tid="+str(tid)+"&pg_token="+request.GET.get("pg_token")
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&tid="+str(tid_no)+"&pg_token="+request.GET.get("pg_token")
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
