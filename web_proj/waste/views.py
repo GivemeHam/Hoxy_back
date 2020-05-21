@@ -251,12 +251,21 @@ def insert_board(request):
     now = datetime.now()
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
+    #image
+    #if(data_dic['files'].len > 2):
+    #    image_data = ContentFile(base64.b64decode(data_dic['files']), name=image_name)
+    #    save_image(image_data, data_dic['file_name'])
+    #else:
+    #    data_dic['file_name']='1'
+        
+         
     #insert
     result = board(board_title=data_dic['board_title'],
                         board_ctnt=data_dic['board_ctnt'],
                         board_reg_user_no=data_dic['board_reg_user_no'],
                         board_reg_date=formatted_date,
-                        board_waste_area_no=data_dic['board_area_no'] )
+                        board_waste_area_no=data_dic['board_area_no'],
+                        board_image_id=data_dic['files'])
     result.save()
 
     context = {'result_value':"success"}
@@ -320,7 +329,7 @@ def insert_board_review(request):
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
     #insert
-    result = board(board_review_board_no=data_dic['board_review_board_no'],
+    result = board_review(board_review_board_no=data_dic['board_review_board_no'],
                         board_review_ctnt=data_dic['board_review_ctnt'],
                         board_review_reg_user_no=data_dic['board_review_reg_user_id'],
                         board_review_reg_date=formatted_date)

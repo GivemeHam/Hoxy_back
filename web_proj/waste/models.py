@@ -39,6 +39,7 @@ class board(models.Model):
     board_reg_user_no = models.IntegerField()
     board_reg_date = models.CharField(max_length=30) 
     board_waste_area_no = models.IntegerField()
+    board_image_id = models.CharField(max_length=30)
 
    # def __str__(self):
     #    return [self.board_no, self.board_title, self.board_ctnt, self.board_reg_user_no, self.board_reg_date, self.board_waste_area_no]
