@@ -20,26 +20,71 @@ from django.core.files.base import ContentFile
 import requests
 from django.http import HttpResponse as Response
 import json
+
+tid=0
 @api_view(['POST'])
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=test&quantity=1&total_amount=123p&tax_free_amount=0&approval_url=http://172.16.46.22:8000/KakaoPaySuccess/&cancel_url=http://172.16.46.22:8000&fail_url=http://172.16.46.22:8000"
+
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=tv123&quantity=1&total_amount=782&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=109&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
+
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
     response = requests.request("POST", url, headers=headers, data = payload)
 
-    print(response.text.encode('utf8'),"here------------------------------")
-    
-    # context = {'result_value':response}
+    #print(response.text.encode('utf8'),"here------------------------------")
+    json_string=response.text.encode('utf8')
+    str_json=json_string.decode('utf-8')
+    dict_json=json.loads(str_json)
+    tid=dict_json['tid']
+    #인증 쌍 만들기
+    random=109
+    result=forpay(random_no=random,
+                        tid=tid)
+    result.save()
+    #
+    request.session['tid']=tid
+    print(tid,"33333333333333",request.session.get('tid'))
+        # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
     return Response(response)    
 
 #######################
+<<<<<<< HEAD
 def KakaoPaySuccess(request):
     print(request.GET.get("pg_token"),"============here=========================")
     
+=======
+@api_view(['GET'])
+def KakaoPaySuccess(request):
+    print(request.GET.get("pg_token"),"============here=========================")
+    print(type(request.GET.get("random")),"please!!!!!!!!")
+    pg_token=request.GET.get("pg_token")
+    #db에서 가져옴
+    results=forpay.objects.filter(random_no=request.GET.get("random"))
+    list=[]
+    for rst in results :
+        dic={}
+        dic["random_no"]=rst.random_no
+        dic['tid']=rst.tid
+        list.append(dic)
+    print(list,"wpqkfwpqkfwpqkf0000000")
+    tid_no=list[0]['tid']
+    #
+    print(type(pg_token),"12341234123412341234","tid!!!!",request.session.get('tid'),tid_no)
+    #
+    url = "https://kapi.kakao.com/v1/payment/approve"
+
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&tid="+str(tid_no)+"&pg_token="+request.GET.get("pg_token")
+    headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
+
+    response = requests.request("POST", url, headers=headers, data = payload)
+
+    print(response.text.encode('utf8'),"here22222------------------------------")
+    #
+>>>>>>> 01b25b6fc370d2e6d72faad1f1625bd051ff5fb4
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
@@ -116,6 +161,22 @@ def select_waste_type(request):
 
     area_no = data_dic['area_no']
     if image_name != "false":
+        #test
+        list = []
+        dic = {}
+        dic['waste_type_no'] = 1
+        dic['waste_type_waste_div_no'] = 1
+        dic['waste_type_name'] = "ss"
+        dic['waste_type_kor_name'] = "한국"
+        dic['waste_type_size'] = "33"
+        dic['waste_type_fee'] = "55"
+        dic['waste_type_area_no'] = "1"
+        list.append(dic)
+        context = {'result_value':list}
+
+        return render(request, 'waste_db/waste_type.html', context )
+
+        #test
         #get image
         answer = inceptionv3_inference(image_name)
     else :
@@ -246,7 +307,7 @@ def insert_board_review(request):
     #insert
     result = board(board_review_board_no=data_dic['board_review_board_no'],
                         board_review_ctnt=data_dic['board_review_ctnt'],
-                        board_review_reg_user_no=data_dic['board_review_reg_user_no'],
+                        board_review_reg_user_no=data_dic['board_review_reg_user_id'],
                         board_reg_date=formatted_date)
     result.save()
 
@@ -255,7 +316,7 @@ def insert_board_review(request):
 
 #response_data
 #board_review_no, board_review_ctnt, board_review_user_name, board_review_reg_date
-def select_board_reivew(request):
+def select_board_review(request):
     #results = board.objects.all()
     data = request.POST.get("data")
     data_dic = literal_eval(data)
@@ -266,7 +327,7 @@ def select_board_reivew(request):
         dic = {}
         dic['board_review_no'] = rst.board_review_no
         dic['board_review_ctnt'] = rst.board_review_ctnt
-        user_name = user_info.objects.filter(user_info_no=rst.board_review_reg_user_no)
+        user_name = user_info.objects.filter(user_info_id=rst.board_review_reg_user_no)
         dic['board_review_user_name'] = user_name[0].user_info_name
         dic['board_review_reg_date'] = rst.board_review_reg_date
         list.append(dic)

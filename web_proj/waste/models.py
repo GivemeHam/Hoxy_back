@@ -1,6 +1,10 @@
 from django.db import models
 
 # Create your models here.
+class forpay(models.Model) :
+    random_no=models.IntegerField(primary_key=True)
+    tid=models.CharField(max_length=30)
+
 class waste_div(models.Model):
     waste_div_no = models.IntegerField(primary_key=True)
     waste_div_name = models.CharField(max_length=30)
