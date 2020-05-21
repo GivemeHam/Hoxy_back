@@ -26,12 +26,25 @@ tid=0
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
 
+#
+    data=request.POST.get("data")
+    data_dic=literal_eval(data)
+    name=data_dic['name']
+    total_fee=data_dic['total_fee']
+    size=data_dic['size']
+    user_name=data_dic['user_name']
+#
+    now = datetime.now()
+    formatted_date = now.strftime('%Y%m%d%H%M%S')
 
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name=tv123&quantity=1&total_amount=782&tax_free_amount=0&approval_url=http://192.168.0.107:8000/KakaoPaySuccess/?random=109&cancel_url=http://192.168.0.107:8000/KakaoPayCancel/&fail_url=http://192.168.0.107:8000/KakaoPayFail/"
+    print(formatted_date,"1321312321313")
 
+    print(name,total_fee,size,"77777777777")
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name="+name+"&quantity="+size+"&total_amount="+total_fee+"&tax_free_amount=0&approval_url=http://172.16.2.161:8000/KakaoPaySuccess/?random="+formatted_date+user_name+"&cancel_url=http://172.16.2.161:8000/KakaoPayCancel/&fail_url=http://172.16.2.161:8000/KakaoPayFail/"
+    payload.encode('UTF-8')
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
-    response = requests.request("POST", url, headers=headers, data = payload)
+    response = requests.request("POST", url, headers=headers, data = payload.encode('UTF-8'))
 
     #print(response.text.encode('utf8'),"here------------------------------")
     json_string=response.text.encode('utf8')
@@ -39,7 +52,7 @@ def KakaoPay(request):
     dict_json=json.loads(str_json)
     tid=dict_json['tid']
     #인증 쌍 만들기
-    random=109
+    random=formatted_date+user_name
     result=forpay(random_no=random,
                         tid=tid)
     result.save()
@@ -52,16 +65,15 @@ def KakaoPay(request):
     return Response(response)    
 
 #######################
-<<<<<<< HEAD
-def KakaoPaySuccess(request):
-    print(request.GET.get("pg_token"),"============here=========================")
-    
-=======
+
 @api_view(['GET'])
 def KakaoPaySuccess(request):
     print(request.GET.get("pg_token"),"============here=========================")
-    print(type(request.GET.get("random")),"please!!!!!!!!")
+    print(type(request.GET.get("random")),"please!!!!!!!!",request.GET.get("random"))
     pg_token=request.GET.get("pg_token")
+    date=request.GET.get("random")[0:13]
+    user_name=request.GET.get("random")[14:]
+    print("date=",date,"user_name",user_name+"ssssssssssssssssssssssssssssssssssoooooooooooooooooooooook")
     #db에서 가져옴
     results=forpay.objects.filter(random_no=request.GET.get("random"))
     list=[]
@@ -84,11 +96,14 @@ def KakaoPaySuccess(request):
 
     print(response.text.encode('utf8'),"here22222------------------------------")
     #
->>>>>>> 01b25b6fc370d2e6d72faad1f1625bd051ff5fb4
+
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
     context = {'result_value':request}
+
+    #todo : 결제 정보 db에 넣기
+    
     return render(request, 'waste_db/KakaoPaySuccess.html', context )
 
 ########################
@@ -161,22 +176,22 @@ def select_waste_type(request):
 
     area_no = data_dic['area_no']
     if image_name != "false":
-        #test
-        list = []
-        dic = {}
-        dic['waste_type_no'] = 1
-        dic['waste_type_waste_div_no'] = 1
-        dic['waste_type_name'] = "ss"
-        dic['waste_type_kor_name'] = "한국"
-        dic['waste_type_size'] = "33"
-        dic['waste_type_fee'] = "55"
-        dic['waste_type_area_no'] = "1"
-        list.append(dic)
-        context = {'result_value':list}
+        # #test
+        # list = []
+        # dic = {}
+        # dic['waste_type_no'] = 1
+        # dic['waste_type_waste_div_no'] = 1
+        # dic['waste_type_name'] = "ss"
+        # dic['waste_type_kor_name'] = "한국"
+        # dic['waste_type_size'] = "33"
+        # dic['waste_type_fee'] = "55"
+        # dic['waste_type_area_no'] = "1"
+        # list.append(dic)
+        # context = {'result_value':list}
 
-        return render(request, 'waste_db/waste_type.html', context )
+        # return render(request, 'waste_db/waste_type.html', context )
 
-        #test
+        # #test
         #get image
         answer = inceptionv3_inference(image_name)
     else :

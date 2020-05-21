@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class forpay(models.Model) :
-    random_no=models.IntegerField(primary_key=True)
+    random_no=models.CharField(primary_key=True,max_length=50)
     tid=models.CharField(max_length=30)
 
 class waste_div(models.Model):
