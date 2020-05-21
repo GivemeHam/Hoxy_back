@@ -273,7 +273,7 @@ def insert_board_review(request):
     result = board(board_review_board_no=data_dic['board_review_board_no'],
                         board_review_ctnt=data_dic['board_review_ctnt'],
                         board_review_reg_user_no=data_dic['board_review_reg_user_id'],
-                        board_reg_date=formatted_date)
+                        board_review_reg_date=formatted_date)
     result.save()
 
     context = {'result_value':"success"}
