@@ -252,8 +252,8 @@ def insert_board(request):
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
     #image
-    if(data_dic['files'].len > 2):
-        image_data = ContentFile(base64.b64decode(data_dic['files']), name=image_name)
+    if len(data_dic['files']) > 3:
+        image_data = ContentFile(base64.b64decode(data_dic['files']), name=data_dic['file_name'])
         save_image(image_data, data_dic['file_name'])
     else:
         data_dic['file_name']='1'
@@ -270,6 +270,39 @@ def insert_board(request):
 
     context = {'result_value':"success"}
     return render(request, 'board_db/insert_board.html', context )
+
+def update_board(request):
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+
+
+    #update
+    board_instance = board.objects.get(board_no=data_dic['board_no'])
+    board_instance.board_title=data_dic['board_title']
+    board_instance.board_ctnt=data_dic['board_ctnt']
+    board_instance.board_area_no=data_dic['board_area_no']
+    board_instance.board_image_id=data_dic['file_name']
+
+    board_instance.save()
+    
+    #image
+    if len(data_dic['files']) > 3:
+        image_data = ContentFile(base64.b64decode(data_dic['files']), name=data_dic['file_name'])
+        save_image(image_data, data_dic['file_name'])
+    else:
+        data_dic['file_name']='1'
+
+    context = {'result_value':"success"}
+    return render(request, 'board_db/insert_board.html', context )
+
+def delete_board(request):
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+    
+    (board.objects.get(board_no=data_dic['board_no'])).delete()
+    
+    context = {'result_value':"success"}
+    return render(request, 'board_db/delete_board.html', context )
 
 #response_data
 #board_no, board_title, board_user_name, board_reg_date,board_waste_area_no
@@ -367,26 +400,31 @@ def insert_user_info(request):
     data_dic = literal_eval(data)
     #select
     results = user_info.objects.filter(user_info_id=data_dic['user_info_id'])
-    for res in results:
+    if not results is None:
         context = {'result_value':"success2"}
         return render(request, 'user_db/insert_user_info.html', context )
-    else:
     #insert
-        result = user_info(user_info_id=data_dic['user_info_id'],
+    result = user_info(user_info_id=data_dic['user_info_id'],
                         user_info_name=data_dic['user_info_name'])
-        result.save()
-        context = {'result_value':"success"}
+    result.save()
+    context = {'result_value':"success"}
     return render(request, 'user_db/insert_user_info.html', context )
 
 #view image
-def get_image(request, image_name="a_1.jpg"):
+def get_image(request, image_name="file_name.jpg"):
     link = "waste/deep_learning/image/"+image_name
 
-    images = []
-    image_data_ = open(link,"rb").read()
-    images.append(image_data_)
+    # Get the image
+    image = open(link, 'rb')
+    image_read = image.read()
 
-    context = {'result_value': link}
+    # Get the Byte-Version of the image
+    image_64_encode = base64.b64encode(image_read)
+
+    # Convert it to a readable utf-8 code (a String)
+    image_encoded = image_64_encode.decode('utf-8')
+    print("image_encoded : " + image_encoded)
+    context = {'result_value': image_encoded}
     return render(request, 'waste_db/get_image.html', context )
 
 def test(request):

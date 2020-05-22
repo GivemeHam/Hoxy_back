@@ -21,6 +21,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MEDIA_URL = 'deep_learning/image/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'image')
+
+STATIC_URL = '/deep_learning/image/' 
+
+STATICFILES_DIRS = (
+
+      "/deep_learning/image/",
+
+      # Put strings here, like "/home/html/static" or "C:/www/django/static".
+
+      # Always use forward slashes, even on Windows.
+
+      # Don't forget to use absolute paths, not relative paths.     
+
+)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
