@@ -273,7 +273,9 @@ def insert_board(request):
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
     #image
-    if len(data_dic['files']) > 3:
+    data_dic['files'] = image_string_format(data_dic['files'])
+    print("data_dic['files'] : " + data_dic['files'])
+    if len(data_dic['files']) > 10:
         image_data = ContentFile(base64.b64decode(data_dic['files']), name=data_dic['file_name'])
         save_image(image_data, data_dic['file_name'])
     else:
@@ -294,27 +296,30 @@ def insert_board(request):
 
 def update_board(request):
     data = request.POST.get("data")
+    print("data : " + data)
     data_dic = literal_eval(data)
 
 
+
     #update
-    board_instance = board.objects.get(board_no=data_dic['board_no'])
+    board_instance = board.objects.get(pk=data_dic['board_no'])
     board_instance.board_title=data_dic['board_title']
     board_instance.board_ctnt=data_dic['board_ctnt']
     board_instance.board_area_no=data_dic['board_area_no']
     board_instance.board_image_id=data_dic['file_name']
-
+    data_dic['files'] = image_string_format(data_dic['files'])
     board_instance.save()
     
     #image
-    if len(data_dic['files']) > 3:
+    print(len(data_dic['files']))
+    if len(data_dic['files']) > 10:
         image_data = ContentFile(base64.b64decode(data_dic['files']), name=data_dic['file_name'])
         save_image(image_data, data_dic['file_name'])
     else:
         data_dic['file_name']='1'
 
     context = {'result_value':"success"}
-    return render(request, 'board_db/insert_board.html', context )
+    return render(request, 'board_db/update_board.html', context )
 
 def delete_board(request):
     data = request.POST.get("data")
@@ -328,13 +333,12 @@ def delete_board(request):
 #response_data
 #board_no, board_title, board_user_name, board_reg_date,board_waste_area_no
 def select_board_title(request):
-    
+    print("connect_select_board_title")
     results = board.objects.all()
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
     
     list = []
     for rst in results:
-        
         dic = {}
         dic["board_no"] = rst.board_no
         dic['board_title'] = rst.board_title
@@ -343,7 +347,7 @@ def select_board_title(request):
         dic['board_reg_date'] = rst.board_reg_date
         dic['board_waste_area_no'] = rst.board_waste_area_no
         list.append(dic)
-        
+    
     context = {'result_value':list}
     return render(request, 'board_db/select_board_title.html', context )
 
@@ -355,20 +359,19 @@ def select_board(request):
     #results = waste_type.objects.all()
     data = request.POST.get("data")
     data_dic = literal_eval(data)
-    results = board.objects.filter(board_no=data_dic['board_no'])
-   
+    results = board.objects.filter(pk=data_dic['board_no'])[0]
     list = []
-    for rst in results:
-        dic = {}
-        dic['board_no'] = rst.board_no
-        dic['board_title'] = rst.board_title
-        dic['board_ctnt'] = rst.board_ctnt
-        user_name = user_info.objects.filter(user_info_id=rst.board_reg_user_no)
-        dic['board_user_name'] = user_name[0].user_info_name
-        dic['board_reg_date'] = rst.board_reg_date
-        dic['board_waste_area_no'] = rst.board_waste_area_no
-        list.append(dic)
-        
+    dic = {}
+    dic['board_no'] = results.board_no
+    dic['board_title'] = results.board_title
+    dic['board_ctnt'] = results.board_ctnt
+    user_name = user_info.objects.filter(user_info_id=results.board_reg_user_no)
+    dic['board_user_name'] = user_name[0].user_info_name
+    dic['board_reg_date'] = results.board_reg_date
+    dic['board_waste_area_no'] = results.board_waste_area_no
+    dic['file_name'] = results.board_image_id
+    list.append(dic)
+    
     context = {'result_value':list}
     return render(request, 'board_db/select_board.html', context )
 
@@ -432,8 +435,10 @@ def insert_user_info(request):
     return render(request, 'user_db/insert_user_info.html', context )
 
 #view image
-def get_image(request, image_name="file_name.jpg"):
-    link = "waste/deep_learning/image/"+image_name
+def get_image(request):
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+    link = "waste/deep_learning/image/"+data_dic['image_name']
 
     # Get the image
     image = open(link, 'rb')
@@ -444,9 +449,15 @@ def get_image(request, image_name="file_name.jpg"):
 
     # Convert it to a readable utf-8 code (a String)
     image_encoded = image_64_encode.decode('utf-8')
-    print("image_encoded : " + image_encoded)
     context = {'result_value': image_encoded}
     return render(request, 'waste_db/get_image.html', context )
+
+def image_string_format(str):
+    imgstr = str
+    imgstr += "=" * ((4 - len(imgstr) % 4) % 4)
+    imgstr = imgstr.translate({ ord(' '): '+' })
+
+    return imgstr
 
 def test(request):
     data = request.POST.get("data")
