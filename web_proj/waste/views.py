@@ -333,7 +333,6 @@ def delete_board(request):
 #response_data
 #board_no, board_title, board_user_name, board_reg_date,board_waste_area_no
 def select_board_title(request):
-    print("connect_select_board_title")
     results = board.objects.all()
     #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
     
