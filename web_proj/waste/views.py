@@ -20,8 +20,9 @@ from django.core.files.base import ContentFile
 import requests
 from django.http import HttpResponse as Response
 import json
+import string
+import random
 
-tid=0
 @api_view(['POST'])
 def KakaoPay(request):
     url = "https://kapi.kakao.com/v1/payment/ready"
@@ -96,15 +97,35 @@ def KakaoPaySuccess(request):
 
     print(response.text.encode('utf8'),"here22222------------------------------")
     #
+    response=response.json()
+    response['code']=getRandomCode()
 
+    print("durlsms!!!!!!!!!!!!!!!!!!!!!!!!!",response)
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
 
-    context = {'result_value':request}
+    context = {'result_value':response}
 
     #todo : 결제 정보 db에 넣기
     
     return render(request, 'waste_db/KakaoPaySuccess.html', context )
+##
+def getRandomCode() :
+
+    LENGTH = 12 # 12자리
+
+    # 숫자 + 대소문자
+    string_pool = string.ascii_uppercase + string.digits
+
+    # 랜덤한 문자열 생성
+    result = "" 
+    for i in range(12) :
+        result += random.choice(string_pool) # 랜덤한 문자열 하나 선택
+
+    return result
+
+
+##
 
 ########################
 def home(request):
