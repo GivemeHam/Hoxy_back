@@ -252,11 +252,11 @@ def insert_board(request):
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
     #image
-    #if(data_dic['files'].len > 2):
-    #    image_data = ContentFile(base64.b64decode(data_dic['files']), name=image_name)
-    #    save_image(image_data, data_dic['file_name'])
-    #else:
-    #    data_dic['file_name']='1'
+    if(data_dic['files'].len > 2):
+        image_data = ContentFile(base64.b64decode(data_dic['files']), name=image_name)
+        save_image(image_data, data_dic['file_name'])
+    else:
+        data_dic['file_name']='1'
         
          
     #insert
@@ -265,7 +265,7 @@ def insert_board(request):
                         board_reg_user_no=data_dic['board_reg_user_no'],
                         board_reg_date=formatted_date,
                         board_waste_area_no=data_dic['board_area_no'],
-                        board_image_id=data_dic['files'])
+                        board_image_id=data_dic['file_name'])
     result.save()
 
     context = {'result_value':"success"}
@@ -377,6 +377,17 @@ def insert_user_info(request):
         result.save()
         context = {'result_value':"success"}
     return render(request, 'user_db/insert_user_info.html', context )
+
+#view image
+def get_image(request, image_name="a_1.jpg"):
+    link = "waste/deep_learning/image/"+image_name
+
+    images = []
+    image_data_ = open(link,"rb").read()
+    images.append(image_data_)
+
+    context = {'result_value': link}
+    return render(request, 'waste_db/get_image.html', context )
 
 def test(request):
     data = request.POST.get("data")

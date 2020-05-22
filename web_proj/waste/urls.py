@@ -17,6 +17,7 @@ urlpatterns = [
     path('KakaoPay/',csrf_exempt(views.KakaoPay), name="KakaoPay"),
     path('KakaoPaySuccess/',csrf_exempt(views.KakaoPaySuccess), name="KakaoPaySuccess"),
     path('test/', csrf_exempt(views.test), name="test"),
+    path('get_image/', csrf_exempt(views.get_image), name="get_image")
     #path('index/', csrf_exempt(views.index), name="index"),
 ]
 
