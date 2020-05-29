@@ -41,7 +41,7 @@ def KakaoPay(request):
     print(formatted_date,"1321312321313")
 
     print(name,total_fee,size,"77777777777")
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name="+name+"&quantity="+size+"&total_amount="+total_fee+"&tax_free_amount=0&approval_url=http://172.16.2.161:8000/KakaoPaySuccess/?random="+formatted_date+user_name+"&cancel_url=http://172.16.2.161:8000/KakaoPayCancel/&fail_url=http://172.16.2.161:8000/KakaoPayFail/"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name="+name+"&quantity="+size+"&total_amount="+total_fee+"&tax_free_amount=0&approval_url=http://172.16.55.149:8000/KakaoPaySuccess/?random="+formatted_date+user_name+"&cancel_url=http://172.16.55.149:8000/KakaoPayCancel/&fail_url=http://172.16.55.149:8000/KakaoPayFail/"
     payload.encode('UTF-8')
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
@@ -50,6 +50,7 @@ def KakaoPay(request):
     #print(response.text.encode('utf8'),"here------------------------------")
     json_string=response.text.encode('utf8')
     str_json=json_string.decode('utf-8')
+    print("json_string : " +str_json)
     dict_json=json.loads(str_json)
     tid=dict_json['tid']
     #인증 쌍 만들기
@@ -99,7 +100,7 @@ def KakaoPaySuccess(request):
     #
     response=response.json()
     response['code']=getRandomCode()
-
+    
     print("durlsms!!!!!!!!!!!!!!!!!!!!!!!!!",response)
     # context = {'result_value':response}
     # return render(request, 'waste_db/pay.html', context )
@@ -239,6 +240,54 @@ def select_waste_type(request):
         dic['waste_type_area_no'] = rst.waste_type_area_no
         list.append(dic)
         
+    context = {'result_value':list}
+    return render(request, 'waste_db/waste_type.html', context )
+
+def select_waste_type_top5(request):
+    #image_name = image_post(request)
+
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+
+    
+    image_name = data_dic['file_name']
+    #image decode
+    imgstr = data_dic['files']
+    imgstr += "=" * ((4 - len(imgstr) % 4) % 4)
+    imgstr = imgstr.translate({ ord(' '): '+' })
+    #logger.error(imgstr)
+    image_data = ContentFile(base64.b64decode(imgstr), name=image_name)
+    
+    save_image(image_data, image_name)
+
+    area_no = data_dic['area_no']
+    if image_name != "false":
+        answer = inceptionv3_inference(image_name)
+    else :
+        print("image not found ERROR")
+    
+    print("answer[0]['1_name'] : " + answer[0]['1_name'])
+    print("2 : " + answer[1]['2_name'])
+    print("3 : " + answer[2]['3_name'])
+    print("4 : " + answer[3]['4_name'])
+    print("5 : " + answer[4]['5_name'])
+    #print(answer[0]['1_name'])
+    #results = waste_type.objects.filter(waste_type_name=data_dic['waste_type_name'], waste_type_area_no=data_dic['waste_type_area_no'])
+    list = []
+    for i in range(0,5) :
+        results = waste_type.objects.filter(waste_type_name=answer[i][str(i+1)+'_name'], waste_type_area_no=area_no)
+        for rst in results:
+            dic = {}
+            dic['waste_type_no'] = rst.waste_type_no
+            dic['waste_type_waste_div_no'] = rst.waste_type_waste_div_no
+            dic['waste_type_name'] = rst.waste_type_name
+            dic['waste_type_kor_name'] = rst.waste_type_kor_name
+            dic['waste_type_size'] = rst.waste_type_size
+            dic['waste_type_fee'] = rst.waste_type_fee
+            dic['waste_type_area_no'] = rst.waste_type_area_no
+            dic['Top']=i+1
+            list.append(dic)
+            
     context = {'result_value':list}
     return render(request, 'waste_db/waste_type.html', context )
 
@@ -450,6 +499,29 @@ def get_image(request):
     image_encoded = image_64_encode.decode('utf-8')
     context = {'result_value': image_encoded}
     return render(request, 'waste_db/get_image.html', context )
+
+
+def insert_apply_info(request):
+    data = request.POST.get("data")
+    data_dic = literal_eval(data)
+    #current_time
+    now = datetime.now()
+    formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+         
+    #insert
+    result = board(apply_info_name=data_dic['apply_info_name'],
+                        apply_info_address=data_dic['apply_info_address'],
+                        apply_info_phone=data_dic['apply_info_phone'],
+                        apply_info_waste_type_no=data_dic['apply_info_waste_type_no'],
+                        apply_info_fee=data_dic['apply_info_fee'],
+                        apply_info_code=data_dic['apply_info_code'],
+                        apply_info_user_no=data_dic['apply_info_user_no'],
+                        apply_info_reg_date=data_dic['apply_info_reg_date'])
+    result.save()
+
+    context = {'result_value':"success"}
+    return render(request, 'waste_db/apply_info.html', context )
+
 
 def image_string_format(str):
     imgstr = str

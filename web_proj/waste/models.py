@@ -57,6 +57,7 @@ class apply_info(models.Model):
     apply_info_waste_type_no = models.IntegerField()
     apply_info_fee = models.CharField(max_length=30) 
     apply_info_code = models.CharField(max_length=30) 
+    apply_info_reg_date = models.CharField(max_length=30) 
     apply_info_user_no = models.IntegerField()
 
 class Image(models.Model):
