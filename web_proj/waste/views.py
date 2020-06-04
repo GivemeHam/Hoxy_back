@@ -309,7 +309,8 @@ def insert_waste_apply_info(request):
                         apply_info_fee=data_dic['apply_info_fee'],
                         apply_info_code=data_dic['apply_info_code'],
                         apply_info_user_no=data_dic['apply_info_user_no'],
-                        apply_info_reg_date = formatted_date)
+                        apply_info_reg_date = formatted_date,
+                        apply_info_total_size = data_dic['total_size'])
     result.save()
 
     context = {'result_value':"success"}
@@ -517,11 +518,14 @@ def select_waste_apply_info(request):
         dic = {}
         dic['apply_info_address'] = rst.apply_info_address
         waste_name = waste_type.objects.filter(waste_type_no=rst.apply_info_waste_type_no)[0]
-        dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name
+        if rst.apply_info_total_size == "1" :
+            dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name
+        else :
+            dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name + " 외 " + rst.apply_info_total_size-1 +"개"
+            
         dic['apply_info_fee'] = rst.apply_info_fee
         dic['apply_info_code'] = rst.apply_info_code
         dic['apply_info_reg_date'] = rst.apply_info_reg_date
-
         list.append(dic)
         
     context = {'result_value':list}

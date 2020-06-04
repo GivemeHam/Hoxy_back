@@ -58,7 +58,8 @@ class apply_info(models.Model):
     apply_info_fee = models.CharField(max_length=30) 
     apply_info_code = models.CharField(max_length=30) 
     apply_info_reg_date = models.CharField(max_length=30) 
-    apply_info_user_no = models.CharField(max_length=30)
+    apply_info_user_no = models.CharField(max_length=30) 
+    apply_info_total_size = models.CharField(max_length=30)
 
 class Image(models.Model):
 	title = models.CharField(max_length=100)
