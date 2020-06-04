@@ -41,7 +41,7 @@ def KakaoPay(request):
     print(formatted_date,"1321312321313")
 
     print(name,total_fee,size,"77777777777")
-    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name="+name+"&quantity="+size+"&total_amount="+total_fee+"&tax_free_amount=0&approval_url=http://172.16.55.149:8000/KakaoPaySuccess/?random="+formatted_date+user_name+"&cancel_url=http://172.16.55.149:8000/KakaoPayCancel/&fail_url=http://172.16.55.149:8000/KakaoPayFail/"
+    payload = "cid=TC0ONETIME&partner_order_id=1001&partner_user_id=gorany&item_name="+name+"&quantity="+size+"&total_amount="+total_fee+"&tax_free_amount=0&approval_url=http://172.16.16.136:8000/KakaoPaySuccess/?random="+formatted_date+user_name+"&cancel_url=http://172.16.16.136:8000/KakaoPayCancel/&fail_url=http://172.16.16.136:8000/KakaoPayFail/"
     payload.encode('UTF-8')
     headers = {'Authorization': 'KakaoAK 07bd56b63267b53895005b8792088d79','Content-Type': 'application/x-www-form-urlencoded','Content-Type': 'application/x-www-form-urlencoded'}
 
@@ -298,6 +298,9 @@ def insert_waste_apply_info(request):
     data = request.POST.get("data")
     data_dic = literal_eval(data)
 
+    now = datetime.now()
+    formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+
     #insert
     result = apply_info(apply_info_name=data_dic['apply_info_name'],
                         apply_info_address=data_dic['apply_info_address'],
@@ -305,7 +308,8 @@ def insert_waste_apply_info(request):
                         apply_info_waste_type_no=data_dic['apply_info_waste_type_no'],
                         apply_info_fee=data_dic['apply_info_fee'],
                         apply_info_code=data_dic['apply_info_code'],
-                        apply_info_user_no=data_dic['apply_info_user_no'] )
+                        apply_info_user_no=data_dic['apply_info_user_no'],
+                        apply_info_reg_date = formatted_date)
     result.save()
 
     context = {'result_value':"success"}
@@ -501,26 +505,28 @@ def get_image(request):
     return render(request, 'waste_db/get_image.html', context )
 
 
-def insert_apply_info(request):
+def select_waste_apply_info(request):
+    #results = waste_type.objects.all()
     data = request.POST.get("data")
     data_dic = literal_eval(data)
-    #current_time
-    now = datetime.now()
-    formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
-         
-    #insert
-    result = board(apply_info_name=data_dic['apply_info_name'],
-                        apply_info_address=data_dic['apply_info_address'],
-                        apply_info_phone=data_dic['apply_info_phone'],
-                        apply_info_waste_type_no=data_dic['apply_info_waste_type_no'],
-                        apply_info_fee=data_dic['apply_info_fee'],
-                        apply_info_code=data_dic['apply_info_code'],
-                        apply_info_user_no=data_dic['apply_info_user_no'],
-                        apply_info_reg_date=data_dic['apply_info_reg_date'])
-    result.save()
+    print("test : " + data_dic['user_no'])
+    results = apply_info.objects.filter(apply_info_user_no=data_dic['user_no'])
+    list = []
 
-    context = {'result_value':"success"}
+    for rst in results:
+        dic = {}
+        dic['apply_info_address'] = rst.apply_info_address
+        waste_name = waste_type.objects.filter(waste_type_no=rst.apply_info_waste_type_no)[0]
+        dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name
+        dic['apply_info_fee'] = rst.apply_info_fee
+        dic['apply_info_code'] = rst.apply_info_code
+        dic['apply_info_reg_date'] = rst.apply_info_reg_date
+
+        list.append(dic)
+        
+    context = {'result_value':list}
     return render(request, 'waste_db/apply_info.html', context )
+
 
 
 def image_string_format(str):
