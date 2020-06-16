@@ -5,7 +5,6 @@ from . import views
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    path("", views.home, name="home"),
     path('select_waste_type/', csrf_exempt(views.select_waste_type), name="waste_type_db"),
     path('select_waste_type_top5/', csrf_exempt(views.select_waste_type_top5), name="select_waste_type_top5"),
     path('insert_waste_apply_info/', csrf_exempt(views.insert_waste_apply_info), name="insert_waste_apply_info"),
