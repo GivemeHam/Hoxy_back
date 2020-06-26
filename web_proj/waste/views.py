@@ -420,10 +420,12 @@ def select_waste_apply_info(request):
         dic = {}
         dic['apply_info_address'] = rst.apply_info_address
         waste_name = waste_type.objects.filter(waste_type_no=rst.apply_info_waste_type_no)[0]
+        print(rst.apply_info_total_size)
         if rst.apply_info_total_size == "1" :
             dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name
         else :
-            dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name + " 외 " + rst.apply_info_total_size-1 +"개"
+            temp = int(rst.apply_info_total_size)-1
+            dic['apply_info_waste_type_name'] = waste_name.waste_type_kor_name + " 외 " + str(temp) +"개"
             
         dic['apply_info_fee'] = rst.apply_info_fee
         dic['apply_info_code'] = rst.apply_info_code
